@@ -56,17 +56,17 @@ def train(args):
         # check if all necessary files exist
         assert os.path.isdir(args.init_from), " %s must be a a path" % args.init_from
         assert os.path.isfile(os.path.join(args.init_from,
-                                           r"d:\works\rnn_2\config.pkl")), "config.pkl file does not exist in path %s" % args.init_from
+                                           r"..\rnn_2\config.pkl")), "config.pkl file does not exist in path %s" % args.init_from
         assert os.path.isfile(os.path.join(args.init_from,
-                                           r"d:\works\rnn_2\chars_vocab.pkl")), "chars_vocab.pkl.pkl file does not exist in path %s" % args.init_from
+                                           r"..\rnn_2\chars_vocab.pkl")), "chars_vocab.pkl.pkl file does not exist in path %s" % args.init_from
         ckpt = tf.train.get_checkpoint_state(args.init_from)
         assert ckpt, "No checkpoint found"
         assert ckpt.model_checkpoint_path, "No model path found in checkpoint"
         assert os.path.isfile(os.path.join(args.init_from,
-                                           r"d:\works\rnn_2\iterations")), "iterations file does not exist in path %s " % args.init_from
+                                           r"..\rnn_2\iterations")), "iterations file does not exist in path %s " % args.init_from
 
         # open old config and check if models are compatible
-        with open(os.path.join(args.init_from, r'd:\works\rnn_2\config.pkl'), 'rb') as f:
+        with open(os.path.join(args.init_from, r'..\rnn_2\config.pkl'), 'rb') as f:
             saved_model_args = cPickle.load(f)
         need_be_same = ["model", "rnn_size", "num_layers"]
         for checkme in need_be_same:
@@ -74,14 +74,14 @@ def train(args):
                 checkme], "Command line argument and saved model disagree on '%s' " % checkme
 
         # open saved vocab/dict and check if vocabs/dicts are compatible
-        with open(os.path.join(args.init_from, r'd:\works\rnn_2\chars_vocab.pkl'), 'rb') as f:
+        with open(os.path.join(args.init_from, r'..\rnn_2\chars_vocab.pkl'), 'rb') as f:
             saved_chars, saved_vocab = cPickle.load(f)
         assert saved_chars == data_loader.chars, "Data and loaded model disagree on character set!"
         assert saved_vocab == data_loader.vocab, "Data and loaded model disagree on dictionary mappings!"
 
-    with open(os.path.join(args.save_dir, r'd:\works\rnn_2\config.pkl'), 'wb') as f:
+    with open(os.path.join(args.save_dir, r'..\rnn_2\config.pkl'), 'wb') as f:
         cPickle.dump(args, f, protocol=2)
-    with open(os.path.join(args.save_dir, r'd:\works\rnn_2\chars_vocab.pkl'), 'wb') as f:
+    with open(os.path.join(args.save_dir, r'..\rnn_2\chars_vocab.pkl'), 'wb') as f:
         cPickle.dump((data_loader.chars, data_loader.vocab), f, protocol=2)
 
     model = Model(args)
@@ -93,7 +93,7 @@ def train(args):
         # restore model and number of iterations
         if args.init_from is not None:
             saver.restore(sess, ckpt.model_checkpoint_path)
-            with open(os.path.join(args.save_dir, r'd:\works\rnn_2\iterations'), 'rb') as f:
+            with open(os.path.join(args.save_dir, r'..\rnn_2\iterations'), 'rb') as f:
                 iterations = cPickle.load(f)
         losses = []
         for e in range(args.num_epochs):
@@ -116,11 +116,11 @@ def train(args):
                 losses.append(train_loss)
                 if (e * data_loader.num_batches + b) % args.save_every == 0 \
                         or (e == args.num_epochs - 1 and b == data_loader.num_batches - 1):  # save for the last result
-                    checkpoint_path = os.path.join(args.save_dir, r'd:\works\rnn_2\model.ckpt')
+                    checkpoint_path = os.path.join(args.save_dir, r'..\rnn_2\model.ckpt')
                     saver.save(sess, checkpoint_path, global_step=iterations)
-                    with open(os.path.join(args.save_dir, r"d:\works\rnn_2\iterations"), 'wb') as f:
+                    with open(os.path.join(args.save_dir, r"..\rnn_2\iterations"), 'wb') as f:
                         cPickle.dump(iterations, f, protocol=2)
-                    with open(os.path.join(args.save_dir, r"d:\works\rnn_2\losses-" + str(iterations)), 'wb') as f:
+                    with open(os.path.join(args.save_dir, r"..\rnn_2\losses-" + str(iterations)), 'wb') as f:
                         cPickle.dump(losses, f, protocol=2)
                     losses = []
                     sys.stdout.write('\n')
